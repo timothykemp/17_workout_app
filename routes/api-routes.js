@@ -1,42 +1,45 @@
-const express = require('express');
-const router = express.Router();
-const Workout = require("../models/workout");
-const mongoose = require('mongoose');
+const db = require("../models");
 
-router.get("/api/workouts", (req, res) => {
-    Workout.find({})
-        .then(workoutData => {
-            res.json(workoutData);
-        })
-        .catch(err => {
-            res.json(err);
-        })
-});
+module.exports = (app) => {
 
-// *Create workout Post
-router.post("/api/workouts", (req, res) => {
+    // *Create workout Post
+    app.post("/api/workouts", ({ body }, res) => {
 
-    Workout.create({})
-        .then(workoutData => {
-            res.json(workoutData)
-        })
-        .catch(err => {
-            res.json(err)
-        })
-});
+        db.Workout.create(body)
+            .then(workoutData => {
+                res.json(workoutData)
+            })
+            .catch(err => {
+                res.json(err)
+            })
+    });
 
-router.put("/api/workouts/:id", ({ body, params }, res) => {
-    console.log('body :>> ', body);
 
-    Workout.findByIdAndUpdate(
-        params.id,
-        { push: { exercises: body } },
-        { new: true, runValidators: true }
-    )
-        .then(workoutData => res.json(workoutData))
-        .catch(err => {
-            res.json(err)
-        })
-});
 
-module.exports = router;
+    app.get("/api/workouts", (req, res) => {
+        db.find({})
+            .then(workoutData => {
+                res.json(workoutData);
+            })
+            .catch(err => {
+                res.json(err);
+            })
+    });
+
+
+
+    app.put("/api/workouts/:id", ({ body, params }, res) => {
+        console.log('body :>> ', body);
+
+        db.findByIdAndUpdate(
+            params.id,
+            { push: { exercises: body } },
+            { new: true, runValidators: true }
+        )
+            .then(workoutData => res.json(workoutData))
+            .catch(err => {
+                res.json(err)
+            })
+    });
+};
+
