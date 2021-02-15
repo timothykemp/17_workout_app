@@ -4,7 +4,6 @@ module.exports = (app) => {
 
     // *Create workout Post
     app.post("/api/workouts", ({ body }, res) => {
-
         db.Workout.create(body)
             .then(workoutData => {
                 res.json(workoutData)
@@ -15,9 +14,8 @@ module.exports = (app) => {
     });
 
 
-
     app.get("/api/workouts", (req, res) => {
-        db.find({})
+        db.Workout.find({}).sort(({ date: 1 }))
             .then(workoutData => {
                 res.json(workoutData);
             })
