@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const options = { toJSON: { virtuals: true } };
+
 const workoutSchema = new Schema(
   {
     day: {
@@ -19,33 +19,14 @@ const workoutSchema = new Schema(
           trim: true,
           required: "Please enter exercise name."
         },
-        duration: {
-          type: Number,
-          required: "Please enter time duration."
-        },
-        weight: {
-          type: Number
-        },
-        reps: {
-          type: Number
-        },
-        sets: {
-          type: Number
-        },
-        distance: {
-          type: Number
-        },
-      },
-    ],
-  },
-  options
-);
-
-workoutSchema.virtual("totalDuration").get(() => {
-  return this.exercises.reduce(reducer, 0);
-});
-
-const reducer = (accumulator, exercise) => accumulator + exercise.duration;
+        duration: Number,
+        weight: Number,
+        reps: Number,
+        sets: Number,
+        distance: Number
+      }
+    ]
+  });
 
 const Workout = mongoose.model("Workout", workoutSchema);
 
