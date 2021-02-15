@@ -1,10 +1,23 @@
-const router = require("express").Router();
-const db = require("../models");
+const express = require("express");
+const router = express.Router();
+const Workout = require("../models/workout");
+const mongoose = require("mongoose");
 
-router.get("/workouts", (_req, res) => {
-    db.Workout.find({})
-        .then((data) => {
-            res.json(data);
+router.get("/api/workouts/range", (req, res) => {
+    Workout.find({}, (err, result) => {
+        if (err) {
+            throw err;
+        }
+        res.send(result);
+    });
+});
+
+router.get("/api/workouts", (req, res) => {
+    Workout.aggregate([
+        { $addFields: { totalDuration: { $sum: '$exercises.duration' } } }
+    ])
+        .then((Workout) => {
+            res.json(Workout);
         })
         .catch((err) => {
             res.json(err);
@@ -12,10 +25,10 @@ router.get("/workouts", (_req, res) => {
 });
 
 // Create new workout
-router.post("/workouts", (_req, res) => {
-    db.Workout.create({})
-        .then((data) => {
-            res.json(data)
+router.post("/api/workouts", ({ body }, res) => {
+    Workout.create(body)
+        .then((newWorkout) => {
+            res.status(200).json(newWorkout)
         })
         .catch((err) => {
             res.json(err)
@@ -23,31 +36,19 @@ router.post("/workouts", (_req, res) => {
 });
 
 
-router.put("/workouts/:id", ({ body, params }, res) => {
-    db.Workout.findByIdAndUpdate(
-        params.id,
-        {
-            $push: {
-                exercises: body
-            }
-        },
+router.put("/api/workouts/:id", (req, res) => {
+    let id = req.params.id;
+
+    Workout.findByIdAndUpdate(
+        { _id: mongoose.Types.ObjectId(id) },
+        { $push: { exercises: req.body } },
         { new: true }
     )
-        .then((data) => {
-            res.json(data)
+        .then((updateWorkout) => {
+            res.json(updateWorkout)
         })
         .catch((err) => {
             res.json(err)
-        })
-});
-
-router.get("/workouts/range", (_req, res) => {
-    db.Workout.find({})
-        .then((data) => {
-            res.json(data)
-        })
-        .catch((err) => {
-            res.json(err);
         })
 });
 
